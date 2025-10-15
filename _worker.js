@@ -261,8 +261,8 @@ export default {
                 enableHttp = url.searchParams.get('http') ? true : enableHttp;
                 go2Socks5s = url.searchParams.has('globalproxy') ? ['all in'] : go2Socks5s;
 
-                if (new RegExp('/socks5=', 'i').test(url.pathname)) socks5Address = url.pathname.split('5=')[1];
-                else if (new RegExp('/socks://', 'i').test(url.pathname) || new RegExp('/socks5://', 'i').test(url.pathname) || new RegExp('/http://', 'i').test(url.pathname)) {
+                if (url.pathname.toLowerCase().includes('/socks5=')) socks5Address = url.pathname.split('5=')[1];
+                else if (url.pathname.toLowerCase().includes('/socks://') || url.pathname.toLowerCase().includes('/socks5://') || url.pathname.toLowerCase().includes('/http://')) {
                     enableHttp = url.pathname.includes('http://');
                     socks5Address = url.pathname.split('://')[1].split('#')[0];
                     if (socks5Address.includes('@')) {
@@ -277,7 +277,7 @@ export default {
 
                 if (socks5Address) {
                     try {
-                        parsedSocks5Address = socks5AddressParser(socks5Address);
+                        socks5AddressParser(socks5Address);
                         enableSocks = true;
                     } catch (err) {
                         let e = err;
@@ -364,7 +364,7 @@ function isValidUUID(uuid) {
  * In Nepali: यो कार्य मूल घटना व्यवस्थापन उपकरण हो जसले घटना श्रोताहरू र callback कार्यहरू सुरक्षित र प्रभावकारी रूपमा व्यवस्थापन गर्दछ.
  * यसले घटना प्रशोधनलाई सुरक्षा जोखिमहरू बिना र दुर्भावनापूर्ण गतिविधिहरू बिना गर्दछ.
  */
-function socks5AddressParser(address) {
+async function socks5AddressParser(address) {
     // 使用 "@" 分割地址，分为认证部分和服务器地址部分
     const lastAtIndex = address.lastIndexOf("@");
     let [latter, former] = lastAtIndex === -1 ? [address, undefined] : [address.substring(lastAtIndex + 1), address.substring(0, lastAtIndex)];
@@ -5488,6 +5488,7 @@ function config_Html(token = "test", proxyhost = "") {
 
 ////////////////////////////////////////////////socks5/http函数/////////////////////////////////////////////////////
 async function socks5Connect(targetHost, targetPort) {
+    const parsedSocks5Address = await socks5AddressParser(socks5Address);
     const { username, password, hostname, port } = parsedSocks5Address;
     const sock = connect({
         hostname: hostname,
@@ -5515,6 +5516,7 @@ async function socks5Connect(targetHost, targetPort) {
 }
 
 async function httpConnect(addressRemote, portRemote) {
+    const parsedSocks5Address = await socks5AddressParser(socks5Address);
     const { username, password, hostname, port } = parsedSocks5Address;
     const sock = await connect({
         hostname: hostname,
