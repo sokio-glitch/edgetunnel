@@ -124,6 +124,7 @@ export default {
             proxyIP = env.PROXYIP || env.proxyip || proxyIP;
             proxyIPs = await 整理(proxyIP);
             proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
+            proxyIP = proxyIP ? proxyIP.toLowerCase() : request.cf.colo + atob('LnByb3h5aXAuY21saXVzc3NzLm5ldA==')
             socks5Address = env.HTTP || env.SOCKS5 || socks5Address;
             socks5s = await 整理(socks5Address);
             socks5Address = socks5s[Math.floor(Math.random() * socks5s.length)];
@@ -5764,7 +5765,7 @@ async function handleWebSocket(request) {
                     if (enableSocks) {
                         sock = enableHttp ? await httpConnect(addr, port) : await socks5Connect(addr, port);
                     } else {
-                        let 反代IP地址 = proxyIP ? proxyIP.toLowerCase() : request.cf.colo + atob('LnByb3h5aXAuY21saXVzc3NzLm5ldA=='), 反代IP端口 = 443;
+                        let 反代IP地址 = proxyIP, 反代IP端口 = 443;
                         if (proxyIP.includes(']:')) {
                             反代IP端口 = parseInt(proxyIP.split(']:')[1]) || 反代IP端口;
                             反代IP地址 = proxyIP.split(']:')[0] + "]" || 反代IP地址;
